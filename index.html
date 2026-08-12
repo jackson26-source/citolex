@@ -24,6 +24,7 @@
     --orp: #ff6b6b;
     --glow-1: rgba(124,108,240,0.18);
     --glow-2: rgba(94,230,199,0.10);
+    --focus-bg: #1c1c29;
     --radius: 14px;
     --radius-sm: 9px;
     font-size: 16px;
@@ -38,6 +39,7 @@
     --accent:#4f8cff; --accent-2:#38d9e0;
     --accent-grad:linear-gradient(135deg,#4f8cff 0%,#6c6cf0 50%,#38d9e0 100%);
     --orp:#ff8a5c; --glow-1:rgba(79,140,255,0.20); --glow-2:rgba(56,217,224,0.12);
+    --focus-bg:#141e36;
   }
   body.theme-forest{
     --bg:#070f0c; --bg-alt:#0b1512; --panel:#101c17; --panel-2:#14231d;
@@ -46,6 +48,7 @@
     --accent:#4caf7d; --accent-2:#a3e635;
     --accent-grad:linear-gradient(135deg,#4caf7d 0%,#7bc96f 50%,#a3e635 100%);
     --orp:#ffb454; --glow-1:rgba(76,175,125,0.20); --glow-2:rgba(163,230,53,0.10);
+    --focus-bg:#162721;
   }
   body.theme-sunset{
     --bg:#120a0a; --bg-alt:#180d0d; --panel:#1f1212; --panel-2:#271614;
@@ -54,6 +57,7 @@
     --accent:#ff7a59; --accent-2:#ffd166;
     --accent-grad:linear-gradient(135deg,#ff7a59 0%,#ff5f8f 50%,#ffd166 100%);
     --orp:#5ee6c7; --glow-1:rgba(255,122,89,0.20); --glow-2:rgba(255,209,102,0.12);
+    --focus-bg:#2c1a1a;
   }
   body.theme-mono{
     --bg:#0a0a0a; --bg-alt:#0f0f0f; --panel:#161616; --panel-2:#1c1c1c;
@@ -62,6 +66,7 @@
     --accent:#d8d8d8; --accent-2:#8a8a8a;
     --accent-grad:linear-gradient(135deg,#e8e8e8 0%,#b0b0b0 50%,#8a8a8a 100%);
     --orp:#ff6b6b; --glow-1:rgba(255,255,255,0.06); --glow-2:rgba(255,255,255,0.04);
+    --focus-bg:#1f1f1f;
   }
   body.theme-highcontrast{
     --bg:#000000; --bg-alt:#000000; --panel:#0c0c0c; --panel-2:#141414;
@@ -70,6 +75,7 @@
     --accent:#ffd400; --accent-2:#00e5ff;
     --accent-grad:linear-gradient(135deg,#ffd400 0%,#ff9900 50%,#00e5ff 100%);
     --orp:#ff3b30; --glow-1:rgba(255,212,0,0.14); --glow-2:rgba(0,229,255,0.10);
+    --focus-bg:#111111;
   }
 
   *{box-sizing:border-box; margin:0; padding:0;}
@@ -296,10 +302,17 @@
     text-align:center; color: var(--text-faint); font-size:12.5px; margin-top: 30px;
   }
 
-  /* FOCUS / READ MODE — flat theme background (var(--bg)), no gradient. */
+  /* FOCUS / READ MODE — solid precomputed --focus-bg per theme (defined
+     above, right next to each theme's other colors) as the base, with the
+     same soft radial-gradient glow used on the main page layered on top for
+     a bit of depth/fade instead of a totally flat color. Deliberately NOT
+     using color-mix() here: it silently failed in testing (unsupported or
+     some other issue), and a plain hex value can't have that problem. */
   .focus-overlay{
     position:fixed; inset:0; z-index:1000;
-    background: var(--bg);
+    background: radial-gradient(1200px 600px at 15% -10%, var(--glow-1), transparent 60%),
+                radial-gradient(1000px 500px at 100% 0%, var(--glow-2), transparent 55%),
+                var(--focus-bg);
     display:none; align-items:center; justify-content:center; flex-direction:column;
     cursor:pointer;
   }
@@ -309,13 +322,13 @@
      vendor-prefixed pseudo-class needs its OWN rule block — combining them
      in one comma-separated selector makes the whole rule invalid (and get
      dropped entirely) in browsers that don't recognize one of the prefixes. */
-  .focus-overlay:fullscreen{ width:100% !important; height:100% !important; background: var(--bg) !important; }
-  .focus-overlay:-webkit-full-screen{ width:100% !important; height:100% !important; background: var(--bg) !important; }
-  .focus-overlay:-ms-fullscreen{ width:100% !important; height:100% !important; background: var(--bg) !important; }
-  .focus-overlay::backdrop{ background: var(--bg) !important; }
-  html:fullscreen, body:fullscreen{ background: var(--bg) !important; }
-  html:-webkit-full-screen, body:-webkit-full-screen{ background: var(--bg) !important; }
-  .focus-overlay::-webkit-backdrop{ background: var(--bg); }
+  .focus-overlay:fullscreen{ width:100% !important; height:100% !important; background: radial-gradient(1200px 600px at 15% -10%, var(--glow-1), transparent 60%), radial-gradient(1000px 500px at 100% 0%, var(--glow-2), transparent 55%), var(--focus-bg) !important; }
+  .focus-overlay:-webkit-full-screen{ width:100% !important; height:100% !important; background: radial-gradient(1200px 600px at 15% -10%, var(--glow-1), transparent 60%), radial-gradient(1000px 500px at 100% 0%, var(--glow-2), transparent 55%), var(--focus-bg) !important; }
+  .focus-overlay:-ms-fullscreen{ width:100% !important; height:100% !important; background: radial-gradient(1200px 600px at 15% -10%, var(--glow-1), transparent 60%), radial-gradient(1000px 500px at 100% 0%, var(--glow-2), transparent 55%), var(--focus-bg) !important; }
+  .focus-overlay::backdrop{ background: var(--focus-bg) !important; }
+  html:fullscreen, body:fullscreen{ background: var(--focus-bg) !important; }
+  html:-webkit-full-screen, body:-webkit-full-screen{ background: var(--focus-bg) !important; }
+  .focus-overlay::-webkit-backdrop{ background: var(--focus-bg); }
   .focus-word-display{
     display:flex; align-items:baseline; justify-content:center; width:82%;
     font-size: clamp(40px, 9vw, 128px); font-weight: 700; letter-spacing: -0.01em;
@@ -881,17 +894,23 @@
   // context does to inheritance.
   function syncFocusColors(){
     const cs = getComputedStyle(document.body);
-    const bg = cs.getPropertyValue('--bg').trim();
+    // --focus-bg is a precomputed, plain hex value per theme (no color-mix,
+    // no runtime math) — getComputedStyle on a custom property returns the
+    // literal authored string (e.g. "#0a0a0d"), not a browser-resolved
+    // rgb(...), which is exactly what we want here: just use it as-is.
+    const focusBg = cs.getPropertyValue('--focus-bg').trim();
     const accent = cs.getPropertyValue('--accent').trim();
     const text = cs.getPropertyValue('--text').trim();
     const faint = cs.getPropertyValue('--text-faint').trim();
-    // Flat theme background, resolved to a literal value and set as a direct
-    // inline style on every layer that could plausibly end up being "the
-    // fullscreen element" per the browser — html, body, and the overlay —
-    // so it doesn't matter which one the browser treats that way.
-    document.documentElement.style.background = bg;
-    document.body.style.background = bg;
-    focusOverlay.style.background = bg;
+    // Only the overlay itself gets the inline background — NOT
+    // document.documentElement / document.body. This function runs on every
+    // theme change (via applyTheme, including page load), so setting the
+    // background on html/body here was leaking the fullscreen focus color
+    // into the regular page background at all times, not just during
+    // fullscreen. The CSS rules below (.focus-overlay:fullscreen,
+    // html:fullscreen/body:fullscreen, ::backdrop) already scope
+    // var(--focus-bg) correctly to only when fullscreen is actually active.
+    focusOverlay.style.background = focusBg;
     focusPivotPart.style.color = accent;
     focusWordDisplay.style.color = text;
     const exitBtn = document.getElementById('focusExitBtn');
