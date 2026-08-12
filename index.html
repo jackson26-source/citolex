@@ -296,9 +296,10 @@
     text-align:center; color: var(--text-faint); font-size:12.5px; margin-top: 30px;
   }
 
-  /* FOCUS / READ MODE */
+  /* FOCUS / READ MODE — flat theme background (var(--bg)), no gradient. */
   .focus-overlay{
-    position:fixed; inset:0; background: var(--bg); z-index:1000;
+    position:fixed; inset:0; z-index:1000;
+    background: var(--bg);
     display:none; align-items:center; justify-content:center; flex-direction:column;
     cursor:pointer;
   }
@@ -884,12 +885,13 @@
     const accent = cs.getPropertyValue('--accent').trim();
     const text = cs.getPropertyValue('--text').trim();
     const faint = cs.getPropertyValue('--text-faint').trim();
-    // Paint the color on every layer that could plausibly end up being "the
+    // Flat theme background, resolved to a literal value and set as a direct
+    // inline style on every layer that could plausibly end up being "the
     // fullscreen element" per the browser — html, body, and the overlay —
     // so it doesn't matter which one the browser treats that way.
-    document.documentElement.style.backgroundColor = bg;
-    document.body.style.backgroundColor = bg;
-    focusOverlay.style.backgroundColor = bg;
+    document.documentElement.style.background = bg;
+    document.body.style.background = bg;
+    focusOverlay.style.background = bg;
     focusPivotPart.style.color = accent;
     focusWordDisplay.style.color = text;
     const exitBtn = document.getElementById('focusExitBtn');
