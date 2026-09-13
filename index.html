@@ -143,26 +143,7 @@
     min-height: 100vh;
     transition: background .25s, color .25s;
   }
-  .wrap{ max-width: 1080px; margin: 0 auto; padding: 0 28px 100px; }
-
-  /* NAV */
-  nav{
-    display:flex; align-items:center; justify-content:space-between;
-    padding: 26px 0; border-bottom: 1px solid var(--border);
-    margin-bottom: 56px;
-  }
-  .logo{ display:flex; align-items:center; gap:10px; }
-  .logo-mark{
-    width: 30px; height: 30px; border-radius: 8px;
-    background: var(--accent-grad);
-    display:flex; align-items:center; justify-content:center;
-    font-weight:800; font-size:15px; color:#0a0a0f;
-  }
-  .logo-word{ font-weight: 700; font-size: 19px; letter-spacing: -0.02em; }
-  .nav-cta{
-    background: var(--text); color:#0a0a0f; border:none; padding: 10px 20px;
-    border-radius: 999px; font-weight:600; font-size:14px; cursor:pointer;
-  }
+  .wrap{ max-width: 1080px; margin: 0 auto; padding: 64px 28px 100px; }
 
   /* HERO */
   .hero{ text-align:center; margin-bottom: 20px; }
@@ -414,16 +395,8 @@
 <body>
 <div class="wrap">
 
-  <nav>
-    <div class="logo">
-      <div class="logo-mark">C</div>
-      <div class="logo-word">citolex</div>
-    </div>
-    <button class="nav-cta" id="startReadingBtn">Start reading</button>
-  </nav>
-
   <div class="hero">
-    <div class="eyebrow"><span class="dot"></span> RSVP reading + natural voice, in one flow</div>
+    <div class="eyebrow"><span class="dot"></span> RSVP reading + text to speech, in one flow</div>
     <h1>Read at the <span>speed of thought.</span></h1>
     <p class="subhead">Paste any text, article, or file. Citolex flashes it word by word — or reads it aloud — so you finish in a fraction of the time.</p>
   </div>
@@ -1084,10 +1057,6 @@
     if (!text) { sourceStatus.textContent = 'Nothing to load yet.'; return; }
     loadWords(text);
     sourceStatus.textContent = 'Loaded ' + words.length + ' words into the reader.';
-  });
-
-  document.getElementById('startReadingBtn').addEventListener('click', () => {
-    document.querySelector('.reader-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
 
   /* ---- focus / read mode ---- */
