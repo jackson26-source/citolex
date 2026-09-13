@@ -159,9 +159,6 @@
     font-weight:800; font-size:15px; color:#0a0a0f;
   }
   .logo-word{ font-weight: 700; font-size: 19px; letter-spacing: -0.02em; }
-  .nav-links{ display:flex; align-items:center; gap: 34px; }
-  .nav-links a{ color: var(--text-dim); text-decoration:none; font-size: 14px; font-weight:500; transition: color .15s; }
-  .nav-links a:hover{ color: var(--text); }
   .nav-cta{
     background: var(--text); color:#0a0a0f; border:none; padding: 10px 20px;
     border-radius: 999px; font-weight:600; font-size:14px; cursor:pointer;
@@ -411,7 +408,6 @@
     .stats-grid{ grid-template-columns: repeat(2,1fr); }
     .panel-row{ grid-template-columns: 1fr; }
     .controls-grid{ grid-template-columns:1fr; gap:16px; }
-    .nav-links{ display:none; }
   }
 </style>
 </head>
@@ -422,11 +418,6 @@
     <div class="logo">
       <div class="logo-mark">C</div>
       <div class="logo-word">citolex</div>
-    </div>
-    <div class="nav-links">
-      <a href="#">How it works</a>
-      <a href="#">Voices</a>
-      <a href="#">Pricing</a>
     </div>
     <button class="nav-cta" id="startReadingBtn">Start reading</button>
   </nav>
