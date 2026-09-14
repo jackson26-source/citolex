@@ -191,6 +191,17 @@
   }
   .phrase-reveal .hit{ color: var(--good); font-weight:600; }
   .phrase-reveal .miss{ color: var(--bad); text-decoration: line-through; text-decoration-color: rgba(255,107,107,0.5); }
+  .answer-compare-label{
+    font-size:11px; text-transform:uppercase; letter-spacing:0.07em; color: var(--text-dim);
+    font-weight:700; margin-bottom:6px; text-align:left;
+  }
+  .your-answer{
+    font-size:15px; line-height:1.8; color: var(--text); text-align:left;
+    background: var(--panel-2); border:1px solid var(--border); border-radius: var(--radius-sm);
+    padding:16px 18px; width:100%; margin-bottom:16px; white-space:pre-wrap; word-break:break-word;
+    box-sizing:border-box;
+  }
+  .your-answer.is-empty{ color: var(--text-dim); font-style:italic; }
   .name-row{ display:flex; gap:10px; width:100%; }
   .name-input{
     flex:1; background: var(--panel-2); border:1px solid var(--border-strong); color: var(--text);
@@ -285,7 +296,12 @@
       <div id="stageResult" hidden style="width:100%;">
         <div class="score-num" id="scoreNum">0%</div>
         <div class="score-tier" id="scoreTier"></div>
-        <div class="phrase-reveal" id="phraseReveal" style="margin-top:18px;"></div>
+        <div style="margin-top:18px; width:100%;">
+          <div class="answer-compare-label">You typed</div>
+          <div class="your-answer" id="yourAnswer"></div>
+          <div class="answer-compare-label">The phrase</div>
+          <div class="phrase-reveal" id="phraseReveal"></div>
+        </div>
         <div id="submitRow" style="margin-top:18px; width:100%;">
           <div class="name-row">
             <input class="name-input" id="nameInput" placeholder="Your name" maxlength="24" autocomplete="off">
@@ -363,6 +379,7 @@
   const recallSubmitBtn = document.getElementById('recallSubmitBtn');
   const scoreNum = document.getElementById('scoreNum');
   const scoreTier = document.getElementById('scoreTier');
+  const yourAnswer = document.getElementById('yourAnswer');
   const phraseReveal = document.getElementById('phraseReveal');
   const nameInput = document.getElementById('nameInput');
   const lbSubmitBtn = document.getElementById('lbSubmitBtn');
@@ -407,14 +424,16 @@
   const SCORE_KEY = 'citolex_game_last_score';
   const NAME_KEY = 'citolex_game_last_name';
   const SUBMITTED_KEY = 'citolex_game_submitted_day';
+  const TYPED_KEY = 'citolex_game_last_typed';
 
   function alreadyPlayedToday(){
     try { return localStorage.getItem(PLAYED_KEY) === String(DAY_IDX); } catch(e) { return false; }
   }
-  function markPlayedToday(pct){
+  function markPlayedToday(pct, typedRaw){
     try {
       localStorage.setItem(PLAYED_KEY, String(DAY_IDX));
       localStorage.setItem(SCORE_KEY, String(pct));
+      localStorage.setItem(TYPED_KEY, typedRaw || '');
     } catch(e){}
   }
   function alreadySubmittedToday(){
@@ -424,9 +443,14 @@
     try { localStorage.setItem(SUBMITTED_KEY, String(DAY_IDX)); } catch(e){}
   }
 
-  function renderResult(pct, revealHtml, isReplay){
+  function renderResult(pct, revealHtml, isReplay, typedRaw){
     scoreNum.textContent = pct + '%';
     scoreTier.textContent = tierFor(pct);
+    const typedTrimmed = (typedRaw || '').trim();
+    yourAnswer.textContent = typedRaw === null
+      ? '(not saved for this play)'
+      : (typedTrimmed || '(nothing typed)');
+    yourAnswer.classList.toggle('is-empty', typedRaw === null || !typedTrimmed);
     phraseReveal.innerHTML = revealHtml;
     scoreNum.style.color = pct >= 50 ? 'var(--good)' : 'var(--text)';
 
@@ -479,10 +503,11 @@
   }
 
   recallSubmitBtn.addEventListener('click', () => {
-    const { pct, revealHtml } = scoreAttempt(recallInput.value);
+    const typedRaw = recallInput.value;
+    const { pct, revealHtml } = scoreAttempt(typedRaw);
     const wasAlreadyPlayed = alreadyPlayedToday();
-    if (!wasAlreadyPlayed) markPlayedToday(pct);
-    renderResult(pct, revealHtml, wasAlreadyPlayed);
+    if (!wasAlreadyPlayed) markPlayedToday(pct, typedRaw);
+    renderResult(pct, revealHtml, wasAlreadyPlayed, typedRaw);
   });
 
   lbSubmitBtn.addEventListener('click', async () => {
@@ -514,12 +539,17 @@
   // If they already played today, skip straight to their stored result.
   if (alreadyPlayedToday()) {
     let storedPct = 0;
+    let storedTyped = null;
     try { storedPct = parseFloat(localStorage.getItem(SCORE_KEY) || '0'); } catch(e){}
-    // We don't have their exact typed text anymore, so just show the
-    // phrase fully revealed (all correct) alongside their real stored score.
-    const revealHtml = TODAY_WORDS.map(w => '<span class="hit">' + w + '</span>').join(' ');
+    try { storedTyped = localStorage.getItem(TYPED_KEY); } catch(e){}
+    // Older plays (before this browser stored the typed text) won't have
+    // TYPED_KEY set — fall back to a fully-correct reveal in that case,
+    // same as before.
+    const revealHtml = storedTyped !== null
+      ? scoreAttempt(storedTyped).revealHtml
+      : TODAY_WORDS.map(w => '<span class="hit">' + w + '</span>').join(' ');
     scoreTier.textContent = '';
-    renderResult(storedPct, revealHtml, true);
+    renderResult(storedPct, revealHtml, true, storedTyped);
   }
 
   // ---- leaderboard ----------------------------------------------------

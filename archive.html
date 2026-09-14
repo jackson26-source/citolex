@@ -206,6 +206,17 @@
   }
   .phrase-reveal .hit{ color: var(--good); font-weight:600; }
   .phrase-reveal .miss{ color: var(--bad); text-decoration: line-through; text-decoration-color: rgba(255,107,107,0.5); }
+  .answer-compare-label{
+    font-size:11px; text-transform:uppercase; letter-spacing:0.07em; color: var(--text-dim);
+    font-weight:700; margin-bottom:6px; text-align:left;
+  }
+  .your-answer{
+    font-size:15px; line-height:1.8; color: var(--text); text-align:left;
+    background: var(--panel-2); border:1px solid var(--border); border-radius: var(--radius-sm);
+    padding:16px 18px; width:100%; margin-bottom:16px; white-space:pre-wrap; word-break:break-word;
+    box-sizing:border-box;
+  }
+  .your-answer.is-empty{ color: var(--text-dim); font-style:italic; }
   .practice-note{ font-size:12.5px; color: var(--text-faint); }
   .play-again-btn{
     background: var(--panel-2); border:1px solid var(--border-strong); color: var(--text); font-weight:600;
@@ -276,7 +287,12 @@
         <div id="stageResult" hidden style="width:100%;">
           <div class="score-num" id="scoreNum">0%</div>
           <div class="score-tier" id="scoreTier"></div>
-          <div class="phrase-reveal" id="phraseReveal" style="margin-top:18px;"></div>
+          <div style="margin-top:18px; width:100%;">
+            <div class="answer-compare-label">You typed</div>
+            <div class="your-answer" id="yourAnswer"></div>
+            <div class="answer-compare-label">The phrase</div>
+            <div class="phrase-reveal" id="phraseReveal"></div>
+          </div>
           <p class="practice-note" style="margin-top:16px;">Practice run — this doesn't go to any leaderboard.</p>
           <button class="play-again-btn" id="playAgainBtn" style="margin-top:14px;">← Back to archive</button>
         </div>
@@ -429,6 +445,7 @@
   const recallSubmitBtn = document.getElementById('recallSubmitBtn');
   const scoreNum = document.getElementById('scoreNum');
   const scoreTier = document.getElementById('scoreTier');
+  const yourAnswer = document.getElementById('yourAnswer');
   const phraseReveal = document.getElementById('phraseReveal');
   const backBtn = document.getElementById('backBtn');
   const playAgainBtn = document.getElementById('playAgainBtn');
@@ -491,10 +508,14 @@
   }
 
   recallSubmitBtn.addEventListener('click', () => {
-    const { pct, revealHtml } = scoreAttempt(recallInput.value, currentWords);
+    const typedRaw = recallInput.value;
+    const { pct, revealHtml } = scoreAttempt(typedRaw, currentWords);
     scoreNum.textContent = pct + '%';
     scoreNum.style.color = pct >= 50 ? 'var(--good)' : 'var(--text)';
     scoreTier.textContent = tierFor(pct);
+    const typedTrimmed = typedRaw.trim();
+    yourAnswer.textContent = typedTrimmed || '(nothing typed)';
+    yourAnswer.classList.toggle('is-empty', !typedTrimmed);
     phraseReveal.innerHTML = revealHtml;
     if (currentDate) markDone(currentDate);
     showStage(stageResult);
