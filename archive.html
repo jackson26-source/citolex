@@ -118,6 +118,20 @@
   }
   .subhead{ color: var(--text-dim); font-size: 15.5px; max-width: 460px; margin: 0 auto; }
 
+  /* MONTH TABS */
+  .month-tabs{
+    display:flex; gap:8px; justify-content:center; margin-bottom:20px; flex-wrap:wrap;
+  }
+  .month-tab{
+    background: var(--panel); border:1px solid var(--border); border-radius:999px;
+    padding:8px 18px; font-size:13px; font-weight:600; color: var(--text-dim);
+    cursor:pointer; font-family:inherit; transition: border-color .15s, color .15s, background .15s;
+  }
+  .month-tab:hover{ border-color: var(--accent); color: var(--text); }
+  .month-tab.is-active{
+    background: var(--accent-grad); border-color:transparent; color:#0a0a0f;
+  }
+
   /* ARCHIVE GRID */
   .archive-grid{
     display:grid; grid-template-columns: repeat(5, 1fr); gap: 10px;
@@ -267,11 +281,12 @@
 
   <div id="gridView">
     <div class="hero">
-      <div class="eyebrow"><span class="dot"></span> September archive</div>
+      <div class="eyebrow"><span class="dot"></span> Daily archive</div>
       <h1>Missed a day? <span>Catch up here.</span></h1>
-      <p class="subhead">Every September phrase, all in one place. Pick a day and play it — just for fun, these don't go to the leaderboard.</p>
+      <p class="subhead">Every phrase from the last three months, all in one place. Pick a day and play it — just for fun, these don't go to the leaderboard.</p>
     </div>
 
+    <div class="month-tabs" id="monthTabs"></div>
     <div class="archive-grid" id="archiveGrid"></div>
 
     <div class="archive-legend">
@@ -349,26 +364,38 @@
     return { y: n.getUTCFullYear(), m: n.getUTCMonth(), d: n.getUTCDate() };
   }
 
-  // ---- build the September 1-30 list -----------------------------------
+  // ---- build a rolling ~3-month list (June through September 2026) ------
   const TODAY = todayUTC();
   const TODAY_STR = dateStr(TODAY.y, TODAY.m, TODAY.d);
   const DAY_LABELS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
+  const MONTHS = [
+    { y: 2026, m: 5, label: 'June' },
+    { y: 2026, m: 6, label: 'July' },
+    { y: 2026, m: 7, label: 'August' },
+    { y: 2026, m: 8, label: 'September' },
+  ];
+
   const DAYS = [];
-  for (let d = 1; d <= 30; d++) {
-    const ds = dateStr(2026, 8, d); // September = month index 8
-    const idx = dayIndexForUTC(2026, 8, d);
-    const weekday = new Date(Date.UTC(2026, 8, d)).getUTCDay();
-    DAYS.push({
-      date: ds,
-      dayNum: d,
-      dayIdx: idx,
-      phraseIdx: phraseIndexForDayIdx(idx),
-      weekdayLabel: DAY_LABELS[weekday],
-      locked: ds > TODAY_STR,
-      isToday: ds === TODAY_STR,
-    });
-  }
+  MONTHS.forEach(mo => {
+    const daysInMonth = new Date(Date.UTC(mo.y, mo.m + 1, 0)).getUTCDate();
+    for (let d = 1; d <= daysInMonth; d++) {
+      const ds = dateStr(mo.y, mo.m, d);
+      const idx = dayIndexForUTC(mo.y, mo.m, d);
+      const weekday = new Date(Date.UTC(mo.y, mo.m, d)).getUTCDay();
+      DAYS.push({
+        date: ds,
+        month: mo.m,
+        monthLabel: mo.label,
+        dayNum: d,
+        dayIdx: idx,
+        phraseIdx: phraseIndexForDayIdx(idx),
+        weekdayLabel: DAY_LABELS[weekday],
+        locked: ds > TODAY_STR,
+        isToday: ds === TODAY_STR,
+      });
+    }
+  });
 
   // ---- ORP flash rendering (same technique as the main game) ----------
   const flashPre = document.getElementById('flashPre');
@@ -489,11 +516,30 @@
     } catch(e){}
   }
 
+  // ---- month tabs ----------------------------------------------------------
+  let selectedMonth = TODAY.m;
+  const monthTabs = document.getElementById('monthTabs');
+  function renderMonthTabs(){
+    monthTabs.innerHTML = MONTHS.map(mo => {
+      const cls = ['month-tab'];
+      if (mo.m === selectedMonth) cls.push('is-active');
+      return '<button class="' + cls.join(' ') + '" data-month="' + mo.m + '">' + mo.label + '</button>';
+    }).join('');
+  }
+  renderMonthTabs();
+  monthTabs.addEventListener('click', (e) => {
+    const btn = e.target.closest('.month-tab');
+    if (!btn) return;
+    selectedMonth = Number(btn.dataset.month);
+    renderMonthTabs();
+    renderGrid();
+  });
+
   // ---- render the grid ---------------------------------------------------
   const archiveGrid = document.getElementById('archiveGrid');
   function renderGrid(){
     const done = loadDoneSet();
-    archiveGrid.innerHTML = DAYS.map(day => {
+    archiveGrid.innerHTML = DAYS.filter(day => day.month === selectedMonth).map(day => {
       const classes = ['archive-day'];
       if (day.locked) classes.push('is-locked');
       if (day.isToday) classes.push('is-today');
@@ -562,7 +608,7 @@
 
     gridView.hidden = true;
     playView.hidden = false;
-    archiveDayLabel.textContent = 'Ready to replay September ' + day.dayNum + ' (' + day.weekdayLabel + ')?';
+    archiveDayLabel.textContent = 'Ready to replay ' + day.monthLabel + ' ' + day.dayNum + ' (' + day.weekdayLabel + ')?';
     showStage(stageIdle);
   }
 
