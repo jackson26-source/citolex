@@ -72,6 +72,7 @@
     --accent-grad: linear-gradient(135deg, #7c6cf0 0%, #b06cf0 50%, #5ee6c7 100%);
     --good: #5ee6c7;
     --bad: #ff6b6b;
+    --warn: #f5c542;
     --glow-1: rgba(124,108,240,0.18);
     --glow-2: rgba(94,230,199,0.10);
     --radius: 14px;
@@ -151,6 +152,18 @@
 
   /* countdown */
   .countdown-num{ font-size: 88px; font-weight:800; color: var(--accent); }
+  .look-here-label{
+    font-size:12.5px; color: var(--text-dim); text-transform:uppercase; letter-spacing:0.08em;
+    font-weight:700; margin-bottom:2px;
+  }
+  .look-here-dot{
+    width:10px; height:10px; border-radius:50%; margin: 10px auto 0;
+    background: var(--accent-grad); animation: look-here-pulse 1s ease-in-out infinite;
+  }
+  @keyframes look-here-pulse{
+    0%, 100% { opacity:0.45; transform:scale(0.8); }
+    50% { opacity:1; transform:scale(1.2); }
+  }
 
   /* flash */
   .word-flash{
@@ -190,6 +203,7 @@
     padding:16px 18px; width:100%;
   }
   .phrase-reveal .hit{ color: var(--good); font-weight:600; }
+  .phrase-reveal .typo{ color: var(--warn); font-weight:600; text-decoration: line-through; text-decoration-color: rgba(245,197,66,0.6); }
   .phrase-reveal .miss{ color: var(--bad); text-decoration: line-through; text-decoration-color: rgba(255,107,107,0.5); }
   .answer-compare-label{
     font-size:11px; text-transform:uppercase; letter-spacing:0.07em; color: var(--text-dim);
@@ -279,7 +293,9 @@
       </div>
 
       <div id="stageCountdown" hidden>
+        <p class="look-here-label">Look here ↓</p>
         <div class="countdown-num" id="countdownNum">3</div>
+        <div class="look-here-dot"></div>
       </div>
 
       <div id="stageFlash" hidden style="width:100%;">
@@ -397,39 +413,75 @@
   function normalizeWord(w){
     return (w || '').toLowerCase().replace(/[^a-z0-9']/g, '');
   }
-  // Sequence-alignment scoring (longest common subsequence over normalized
+  function levenshtein(a, b){
+    const n = a.length, m = b.length;
+    if (n === 0) return m;
+    if (m === 0) return n;
+    const dp = new Array(m + 1);
+    for (let j = 0; j <= m; j++) dp[j] = j;
+    for (let i = 1; i <= n; i++){
+      let prev = dp[0];
+      dp[0] = i;
+      for (let j = 1; j <= m; j++){
+        const tmp = dp[j];
+        dp[j] = Math.min(dp[j] + 1, dp[j - 1] + 1, prev + (a[i - 1] === b[j - 1] ? 0 : 1));
+        prev = tmp;
+      }
+    }
+    return dp[m];
+  }
+  // A near-miss is worth half credit: close enough in spelling that it's
+  // clearly the intended word, just mistyped.
+  function isTypo(a, b){
+    if (!a || !b) return false;
+    const dist = levenshtein(a, b);
+    if (dist === 0) return false;
+    return dist === 1 || dist / Math.max(a.length, b.length) <= 0.25;
+  }
+  // Sequence-alignment scoring (Needleman-Wunsch style, over normalized
   // words) instead of strict position-by-position matching. A skipped or
   // reordered word then only costs that one word, instead of shifting
-  // every word after it out of alignment and sinking the whole score.
+  // every word after it out of alignment and sinking the whole score. An
+  // exact word scores 1 (green); a close misspelling scores 0.5 (shown
+  // crossed out in yellow); anything else scores 0 (miss, red).
   function scoreAttempt(typedText){
     const typed = typedText.trim().split(/\s+/).filter(Boolean).slice(0, 400).map(normalizeWord);
     const actual = TODAY_WORDS.map(normalizeWord);
     const n = actual.length, m = typed.length;
+    function pairScore(a, b){
+      if (!a || !b) return -Infinity;
+      if (a === b) return 1;
+      return isTypo(a, b) ? 0.5 : -Infinity;
+    }
     const dp = [];
     for (let i = 0; i <= n; i++) dp.push(new Array(m + 1).fill(0));
     for (let i = 1; i <= n; i++){
       for (let j = 1; j <= m; j++){
-        dp[i][j] = (actual[i - 1].length > 0 && actual[i - 1] === typed[j - 1])
-          ? dp[i - 1][j - 1] + 1
-          : Math.max(dp[i - 1][j], dp[i][j - 1]);
+        const sim = pairScore(actual[i - 1], typed[j - 1]);
+        const diag = sim === -Infinity ? -Infinity : dp[i - 1][j - 1] + sim;
+        dp[i][j] = Math.max(diag, dp[i - 1][j], dp[i][j - 1]);
       }
     }
-    const hitSet = new Set();
+    const status = new Array(n).fill('miss');
     let i = n, j = m;
     while (i > 0 && j > 0) {
-      if (actual[i - 1].length > 0 && actual[i - 1] === typed[j - 1]) {
-        hitSet.add(i - 1);
+      const sim = pairScore(actual[i - 1], typed[j - 1]);
+      if (sim !== -Infinity && dp[i][j] === dp[i - 1][j - 1] + sim) {
+        status[i - 1] = sim === 1 ? 'hit' : 'typo';
         i--; j--;
-      } else if (dp[i - 1][j] >= dp[i][j - 1]) {
+      } else if (dp[i][j] === dp[i - 1][j]) {
         i--;
       } else {
         j--;
       }
     }
-    const correct = dp[n][m];
+    let correct = 0;
     const revealHtml = TODAY_WORDS.map((w, idx) => {
+      const s = status[idx];
+      if (s === 'hit') correct += 1;
+      else if (s === 'typo') correct += 0.5;
       const span = document.createElement('span');
-      span.className = hitSet.has(idx) ? 'hit' : 'miss';
+      span.className = s;
       span.textContent = w;
       return span.outerHTML;
     }).join(' ');
@@ -510,7 +562,7 @@
 
   function runFlash(){
     showStage(stageFlash);
-    const msPerWord = 60000 / 1000; // 1000 wpm
+    const msPerWord = 60000 / 950; // actual flash speed 950 wpm — copy still says "1,000 words a minute"
     let i = 0;
     function step(){
       if (i >= TODAY_WORDS.length) {
