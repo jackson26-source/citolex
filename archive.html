@@ -11,27 +11,26 @@
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="google-site-verification" content="3nlRLx_6ELsKxvM9fOsTG3OEBVYr0L6_RtETBHpjCoc" />
 
-<title>Citolex — can you read at 1000 wpm?</title>
-<meta name="description" content="A new 20-word phrase every day, flashed for about a second at 1000 words per minute. Type back what you saw, get scored on accuracy, and climb the daily, weekly, and monthly leaderboard. Free, no sign-up.">
-<link rel="canonical" href="https://citolex.com/">
+<title>Citolex — September archive</title>
+<meta name="description" content="Missed a day? Every Citolex daily speed-reading challenge from September, all in one place. Pick a day and play it for fun — practice only, no leaderboard.">
+<link rel="canonical" href="https://citolex.com/archive.html">
 
 <!-- Open Graph / Facebook / LinkedIn -->
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://citolex.com/">
+<meta property="og:url" content="https://citolex.com/archive.html">
 <meta property="og:site_name" content="Citolex">
-<meta property="og:title" content="Citolex — can you read at 1000 wpm?">
-<meta property="og:description" content="A new 20-word phrase every day, flashed for about a second. Type back what you saw and climb the leaderboard.">
+<meta property="og:title" content="Citolex — September archive">
+<meta property="og:description" content="Missed a day? Every daily challenge from September, all in one place. Practice only — no leaderboard.">
 <meta property="og:image" content="https://citolex.com/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:url" content="https://citolex.com/">
-<meta name="twitter:title" content="Citolex — can you read at 1000 wpm?">
-<meta name="twitter:description" content="A new 20-word phrase every day, flashed for about a second. Type back what you saw and climb the leaderboard.">
+<meta name="twitter:url" content="https://citolex.com/archive.html">
+<meta name="twitter:title" content="Citolex — September archive">
+<meta name="twitter:description" content="Missed a day? Every daily challenge from September, all in one place. Practice only — no leaderboard.">
 <meta name="twitter:image" content="https://citolex.com/og-image.jpg">
 
 <!-- Icons / theme -->
@@ -40,18 +39,6 @@
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta name="theme-color" content="#0a0a0f">
-
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Game",
-  "name": "Citolex Daily Speed Read",
-  "url": "https://citolex.com/",
-  "description": "A free daily game: a 20-word phrase is flashed at 1000 words per minute, then you type back what you saw and get scored on accuracy.",
-  "genre": "Word game",
-  "isAccessibleForFree": true
-}
-</script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -104,13 +91,13 @@
     font-weight:800; font-size:15px; color:#0a0a0f;
   }
   .logo-word{ font-weight: 700; font-size: 19px; letter-spacing: -0.02em; }
-  .reader-link{
+  .top-actions{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+  .nav-link{
     background: var(--panel-2); border:1px solid var(--border-strong); color: var(--text);
     padding: 9px 16px; border-radius: 999px; font-size:13.5px; font-weight:600;
     text-decoration:none; transition: border-color .15s;
   }
-  .reader-link:hover{ border-color: var(--accent); }
-  .top-actions{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+  .nav-link:hover{ border-color: var(--accent); }
 
   /* HERO */
   .hero{ text-align:center; margin-bottom: 28px; }
@@ -122,15 +109,49 @@
   }
   .dot{ width:6px; height:6px; border-radius:50%; background: var(--accent-2); }
   h1{
-    font-size: 40px; font-weight: 800; letter-spacing: -0.03em; line-height:1.1;
+    font-size: 36px; font-weight: 800; letter-spacing: -0.03em; line-height:1.1;
     margin-bottom: 14px;
   }
   h1 span{
     background: var(--accent-grad); -webkit-background-clip: text; background-clip: text; color: transparent;
   }
-  .subhead{ color: var(--text-dim); font-size: 16px; max-width: 480px; margin: 0 auto; }
+  .subhead{ color: var(--text-dim); font-size: 15.5px; max-width: 460px; margin: 0 auto; }
 
-  /* GAME CARD */
+  /* ARCHIVE GRID */
+  .archive-grid{
+    display:grid; grid-template-columns: repeat(5, 1fr); gap: 10px;
+    margin-top: 6px;
+  }
+  .archive-day{
+    background: var(--panel); border:1px solid var(--border); border-radius: 12px;
+    padding: 14px 8px 12px; text-align:center; cursor:pointer; color: var(--text);
+    font-family: inherit; transition: border-color .15s, transform .1s;
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+  }
+  .archive-day:hover{ border-color: var(--accent); }
+  .archive-day:active{ transform: scale(0.97); }
+  .archive-day .day-num{ font-size: 17px; font-weight:700; }
+  .archive-day .day-label{ font-size: 10.5px; color: var(--text-faint); text-transform:uppercase; letter-spacing:0.04em; }
+  .archive-day .day-badge{ font-size: 10.5px; margin-top:2px; }
+  .archive-day.is-today{ border-color: var(--accent); background: rgba(124,108,240,0.08); }
+  .archive-day.is-done .day-badge{ color: var(--good); }
+  .archive-day.is-locked{
+    cursor:default; opacity:0.4; background: var(--bg-alt);
+  }
+  .archive-day.is-locked:hover{ border-color: var(--border); }
+  .archive-day.is-locked .day-badge{ color: var(--text-faint); }
+
+  .archive-legend{
+    display:flex; gap:18px; justify-content:center; margin-top:22px;
+    font-size:12px; color: var(--text-faint);
+  }
+  .archive-legend span{ display:inline-flex; align-items:center; gap:6px; }
+  .legend-dot{ width:8px; height:8px; border-radius:50%; }
+  .legend-dot.done{ background: var(--good); }
+  .legend-dot.locked{ background: var(--text-faint); }
+  .legend-dot.today{ background: var(--accent); }
+
+  /* PLAY VIEW (reused game stage look) */
   .game-card{
     background: var(--panel); border:1px solid var(--border); border-radius: 20px;
     padding: 8px; margin-bottom: 22px; box-shadow: 0 30px 80px -30px rgba(0,0,0,0.6);
@@ -140,19 +161,15 @@
     display:flex; align-items:center; justify-content:center; flex-direction:column;
     text-align:center; position:relative; min-height: 260px; gap: 18px;
   }
-
-  /* idle */
-  .phrase-meta{ font-size:12.5px; color: var(--text-faint); }
-  .play-btn{
-    background: var(--accent-grad); border:none; color:#0a0a0f; font-weight:700; font-size:16px;
-    padding: 16px 36px; border-radius:999px; cursor:pointer; box-shadow: 0 12px 30px -10px rgba(124,108,240,0.5);
+  .back-link{
+    display:inline-flex; align-items:center; gap:6px; color: var(--text-dim);
+    font-size:13.5px; text-decoration:none; margin-bottom:18px; cursor:pointer;
+    background:none; border:none; font-family:inherit; padding:0;
   }
-  .rules-hint{ font-size:13.5px; color: var(--text-dim); max-width:360px; }
+  .back-link:hover{ color: var(--text); }
 
-  /* countdown */
   .countdown-num{ font-size: 88px; font-weight:800; color: var(--accent); }
 
-  /* flash */
   .word-flash{
     display:flex; align-items:baseline; justify-content:center; width:100%;
     font-size: 44px; font-weight: 700; letter-spacing: -0.01em;
@@ -168,7 +185,7 @@
   }
   .flash-progress-fill{ height:100%; width:0%; background: var(--accent-grad); }
 
-  /* recall */
+  .rules-hint{ font-size:13.5px; color: var(--text-dim); max-width:360px; }
   .recall-input{
     width:100%; min-height:100px; background: var(--panel-2); border:1px solid var(--border-strong);
     border-radius: var(--radius-sm); padding:14px 16px; font-size:15px; color: var(--text);
@@ -179,9 +196,7 @@
     background: var(--accent-grad); border:none; color:#0a0a0f; font-weight:700; font-size:14.5px;
     padding: 13px 20px; border-radius: var(--radius-sm); cursor:pointer; width:100%;
   }
-  .submit-btn:disabled{ opacity:0.5; cursor:not-allowed; }
 
-  /* result */
   .score-num{ font-size: 56px; font-weight:800; letter-spacing:-0.02em; }
   .score-tier{ font-size:14.5px; color: var(--text-dim); margin-top:-8px; }
   .phrase-reveal{
@@ -191,50 +206,19 @@
   }
   .phrase-reveal .hit{ color: var(--good); font-weight:600; }
   .phrase-reveal .miss{ color: var(--bad); text-decoration: line-through; text-decoration-color: rgba(255,107,107,0.5); }
-  .name-row{ display:flex; gap:10px; width:100%; }
-  .name-input{
-    flex:1; background: var(--panel-2); border:1px solid var(--border-strong); color: var(--text);
-    padding:12px 14px; border-radius: var(--radius-sm); font-size:14px; font-family:inherit;
-  }
-  .name-input:focus{ outline:none; border-color: var(--accent); }
-  .name-input:disabled{ opacity:0.5; }
-  .lb-submit-btn{
+  .practice-note{ font-size:12.5px; color: var(--text-faint); }
+  .play-again-btn{
     background: var(--panel-2); border:1px solid var(--border-strong); color: var(--text); font-weight:600;
-    font-size:13.5px; padding: 0 20px; border-radius: var(--radius-sm); cursor:pointer; white-space:nowrap;
+    font-size:13.5px; padding: 11px 22px; border-radius: 999px; cursor:pointer;
   }
-  .lb-submit-btn:hover{ border-color: var(--accent); }
-  .lb-submit-btn:disabled{ opacity:0.5; cursor:not-allowed; }
-  .again-note{ font-size:12.5px; color: var(--text-faint); }
-  .submitted-note{ font-size:13px; color: var(--accent-2); font-weight:600; }
-
-  /* LEADERBOARD */
-  .lb-card{ background: var(--panel); border:1px solid var(--border); border-radius: var(--radius); padding: 20px 22px; }
-  .lb-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
-  .lb-header h3{ font-size:14px; font-weight:600; }
-  .lb-tabs{ display:flex; gap:6px; }
-  .lb-tab{
-    font-size:12px; color: var(--text-dim); background: var(--panel-2); border:1px solid var(--border);
-    padding:6px 12px; border-radius:8px; cursor:pointer; font-weight:500;
-  }
-  .lb-tab.active{ background: rgba(124,108,240,0.15); border-color: var(--accent); color: var(--accent-2); }
-  .lb-row{
-    display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--border);
-    font-size:14px;
-  }
-  .lb-row:last-child{ border-bottom:none; }
-  .lb-rank{ width:22px; color: var(--text-faint); font-weight:700; font-size:12.5px; text-align:center; flex-shrink:0; }
-  .lb-name{ flex:1; color: var(--text); font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .lb-score{ color: var(--accent-2); font-weight:700; font-variant-numeric: tabular-nums; }
-  .lb-empty{ font-size:13px; color: var(--text-faint); text-align:center; padding: 18px 0; }
-
-  .name-note{ text-align:center; color: var(--text-faint); font-size:12.5px; margin-top: 28px; }
+  .play-again-btn:hover{ border-color: var(--accent); }
 
   [hidden]{ display:none !important; }
 
   @media (max-width: 520px){
-    h1{ font-size:30px; }
+    h1{ font-size:27px; }
     .word-flash{ font-size:32px; }
-    .name-row{ flex-direction:column; }
+    .archive-grid{ grid-template-columns: repeat(4, 1fr); }
   }
 </style>
 </head>
@@ -247,91 +231,105 @@
       <div class="logo-word">citolex</div>
     </a>
     <div class="top-actions">
-      <a class="reader-link" href="/archive.html">September archive</a>
-      <a class="reader-link" href="/reader.html">Try the reader tool →</a>
+      <a class="nav-link" href="/reader.html">Reader tool</a>
+      <a class="nav-link" href="/">Today's challenge →</a>
     </div>
   </div>
 
-  <div class="hero">
-    <div class="eyebrow"><span class="dot"></span> Daily speed reading challenge</div>
-    <h1>Can you read at <span>1,000 words a minute?</span></h1>
-    <p class="subhead">A new 20-word phrase every day. We flash it for about a second, total. Type back what you saw.</p>
+  <div id="gridView">
+    <div class="hero">
+      <div class="eyebrow"><span class="dot"></span> September archive</div>
+      <h1>Missed a day? <span>Catch up here.</span></h1>
+      <p class="subhead">Every September phrase, all in one place. Pick a day and play it — just for fun, these don't go to the leaderboard.</p>
+    </div>
+
+    <div class="archive-grid" id="archiveGrid"></div>
+
+    <div class="archive-legend">
+      <span><span class="legend-dot today"></span> Today</span>
+      <span><span class="legend-dot done"></span> Played</span>
+      <span><span class="legend-dot locked"></span> Not yet</span>
+    </div>
   </div>
 
-  <div class="game-card">
-    <div class="game-stage">
+  <div id="playView" hidden>
+    <button class="back-link" id="backBtn">← Back to archive</button>
 
-      <div id="stageIdle">
-        <p class="rules-hint">20 words, flashed one at a time at 1,000 words per minute — roughly 60 milliseconds each. That's the whole game.</p>
-        <button class="play-btn" id="startBtn" style="margin-top:18px;">Flash today's phrase</button>
-        <p class="phrase-meta" id="phraseMeta" style="margin-top:14px;"></p>
-      </div>
+    <div class="game-card">
+      <div class="game-stage">
 
-      <div id="stageCountdown" hidden>
-        <div class="countdown-num" id="countdownNum">3</div>
-      </div>
-
-      <div id="stageFlash" hidden style="width:100%;">
-        <div class="word-flash" id="wordFlash"><span class="pre" id="flashPre"></span><span class="pivot" id="flashPivot"></span><span class="post" id="flashPost"></span></div>
-        <div class="flash-progress"><div class="flash-progress-fill" id="flashProgressFill"></div></div>
-      </div>
-
-      <div id="stageRecall" hidden style="width:100%;">
-        <p class="rules-hint" style="margin-bottom:14px;">Type as much of it as you remember, in order. Guessing is fine.</p>
-        <textarea class="recall-input" id="recallInput" placeholder="What did you see?" autocomplete="off" autocapitalize="off" spellcheck="false"></textarea>
-        <button class="submit-btn" id="recallSubmitBtn" style="margin-top:14px;">See my score</button>
-      </div>
-
-      <div id="stageResult" hidden style="width:100%;">
-        <div class="score-num" id="scoreNum">0%</div>
-        <div class="score-tier" id="scoreTier"></div>
-        <div class="phrase-reveal" id="phraseReveal" style="margin-top:18px;"></div>
-        <div id="submitRow" style="margin-top:18px; width:100%;">
-          <div class="name-row">
-            <input class="name-input" id="nameInput" placeholder="Your name" maxlength="24" autocomplete="off">
-            <button class="lb-submit-btn" id="lbSubmitBtn">Submit score</button>
-          </div>
+        <div id="stageCountdown">
+          <div class="countdown-num" id="countdownNum">3</div>
         </div>
-        <p class="again-note" id="againNote" style="margin-top:14px;">One phrase per day — a new one lands at midnight UTC.</p>
-      </div>
 
+        <div id="stageFlash" hidden style="width:100%;">
+          <div class="word-flash" id="wordFlash"><span class="pre" id="flashPre"></span><span class="pivot" id="flashPivot"></span><span class="post" id="flashPost"></span></div>
+          <div class="flash-progress"><div class="flash-progress-fill" id="flashProgressFill"></div></div>
+        </div>
+
+        <div id="stageRecall" hidden style="width:100%;">
+          <p class="rules-hint" style="margin-bottom:14px;">Type as much of it as you remember, in order. Guessing is fine.</p>
+          <textarea class="recall-input" id="recallInput" placeholder="What did you see?" autocomplete="off" autocapitalize="off" spellcheck="false"></textarea>
+          <button class="submit-btn" id="recallSubmitBtn" style="margin-top:14px;">See my score</button>
+        </div>
+
+        <div id="stageResult" hidden style="width:100%;">
+          <div class="score-num" id="scoreNum">0%</div>
+          <div class="score-tier" id="scoreTier"></div>
+          <div class="phrase-reveal" id="phraseReveal" style="margin-top:18px;"></div>
+          <p class="practice-note" style="margin-top:16px;">Practice run — this doesn't go to any leaderboard.</p>
+          <button class="play-again-btn" id="playAgainBtn" style="margin-top:14px;">← Back to archive</button>
+        </div>
+
+      </div>
     </div>
   </div>
-
-  <div class="lb-card">
-    <div class="lb-header">
-      <h3>Leaderboard</h3>
-      <div class="lb-tabs" id="lbTabs">
-        <div class="lb-tab active" data-period="daily">Today</div>
-        <div class="lb-tab" data-period="weekly">This week</div>
-        <div class="lb-tab" data-period="monthly">This month</div>
-      </div>
-    </div>
-    <div id="lbList"><div class="lb-empty">Loading…</div></div>
-  </div>
-
-  <p class="name-note">citolex.com</p>
 
 </div>
 
 <script>
-  // ---- daily phrase pool ----------------------------------------------
-  // Same phrase for everyone on a given UTC day (like a Wordle puzzle).
-  // Anchored to a fixed epoch so the index is stable and deterministic.
+  // ---- same phrase pool + epoch as the main game, so a given day's
+  // archive phrase always matches what actually flashed live that day ----
   const PHRASES = ["A raccoon opened my mailbox this morning, read three bills out loud, and left without any real comment at all.", "Somewhere in rural Ohio a goose has apparently been elected mayor and nobody is entirely sure how that happened. Somehow.", "My grandmother beat a visiting chess grandmaster using only pawns because she flatly refuses to move the horse ones. Apparently.", "The vending machine downstairs only accepts steady eye contact and exact change, which honestly is a lot to ask. Naturally.", "Scientists confirmed today that hamsters absolutely do remember every single wheel you promised to buy them last year. Of course.", "A man in Denver taught his houseplant to sigh dramatically whenever the thermostat quietly drops below sixty degrees. As usual.", "Somewhere a duck is currently winning a long staring contest against a toddler and neither one will back down. Obviously.", "The office printer has developed strong opinions about Mondays and now refuses to print anything before ten sharp. For once.", "A squirrel filed a formal written complaint after the park bench was moved four entire inches without any warning. Eventually.", "Three pigeons held a private meeting on my windowsill and left before ever telling me what they had decided. Reportedly.", "My neighbor's cat has started leaving one single shoe outside every night and we have stopped asking why. No joke.", "The moon looked extremely smug last night and honestly nobody around here has been able to explain that feeling. Allegedly.", "A snail entered itself in a full marathon purely to enjoy the scenery and skip the awkward small talk. Predictably.", "Somewhere a toaster is quietly plotting something and the bread has absolutely no idea what is coming next. Yet again.", "My uncle insists the microwave is haunted because it beeps twice whenever nobody else is even in the kitchen. Unsurprisingly.", "A whole flock of seagulls unionized this week and demanded better fries and much shorter working hours at the pier.", "The dog next door has learned to open doors but only ever opens the ones nobody actually wanted opened. Inexplicably.", "A tired lighthouse keeper reported his own lighthouse blinking back at him in what he described as visible disappointment. Understandably.", "Somewhere a penguin is currently rehearsing a long speech nobody asked for about the injustice of small pockets. Fair enough.", "My printer jammed again, sighed audibly, and then very slowly printed a single sheet that just said \"not today.\" Miraculously.", "A goldfish has been staring at the exact same castle for six years and still hasn't found the door. Somehow.", "The elevator in my building only stops on floors it personally finds interesting, which sadly excludes mine entirely. Case closed.", "A crow stole my sunglasses, tried them on immediately, and flew off looking extremely pleased with itself indeed. Enough said.", "Somewhere a garden gnome has gone quietly missing and the whole neighborhood suspects everyone but nobody has any real proof.", "My alarm clock now negotiates with me every single morning instead of simply doing the one job it has. Apparently.", "A turtle crossed the busy road so slowly that traffic eventually just gave up and rerouted around the entire block.", "The office coffee machine has started making decisions for us and honestly its choices have been pretty solid lately. Naturally.", "Somewhere a llama is sternly judging a talent show and has already decided nobody deserves to win this year. Obviously.", "My umbrella turned itself inside out, looked at the wind, and simply refused to participate in today's weather. No comment.", "A parrot learned my landlord's exact voice and now demands rent from anyone who walks past the balcony door. Eventually.", "The traffic light near my house has very clearly picked a favorite car and it is definitely not mine. Reportedly.", "Somewhere a hedgehog has quietly been declared the unofficial mayor of a small garden nobody remembers actually planting. Make sense?", "My blender makes a sound like it's silently judging every smoothie decision I have ever made in my life. Allegedly.", "A flamingo stood perfectly still on one leg for so long that scientists began questioning their entire understanding of balance.", "The office plant has now outlived four employees and shows absolutely no signs of slowing its quiet takeover plans. Predictably.", "Somewhere a beaver has built a dam so impressive that local engineers have quietly asked for its actual resume. Unsurprisingly.", "My cat knocked a single pen off the desk, made direct eye contact, and then knocked off a second. Inexplicably.", "An owl moved into the attic and has started rearranging the boxes according to some private filing system. Who knew.", "The bakery down the street sells bread that apparently argues back if you happen to squeeze it too aggressively. Understandably.", "Somewhere a peacock has firmly decided today is the day everyone finally appreciates how hard he has worked. Go figure.", "My neighbor's rooster has finally learned to sleep in and now crows at a much more reasonable hour daily. Miraculously.", "A raccoon carefully washed a single grape for eleven minutes before eventually deciding it simply was not worth eating. Somehow.", "The library cat has started shelving books strictly by color and honestly the whole system somehow makes perfect sense. Apparently.", "Somewhere a moose wandered calmly into a coffee shop, ordered nothing, and left a surprisingly generous tip anyway. Of course.", "My toaster ejected the bread so violently this morning that it briefly achieved something resembling actual flight. And nobody argued.", "A pigeon has been sitting on the exact same statue for years, clearly convinced the position pays somehow. As usual.", "The office fish tank has noticeably better morale than most meetings and frankly nobody wants to talk about that. Naturally.", "Somewhere a sloth finished the race dead last, accepted the trophy anyway, and nobody had the heart to argue. Obviously.", "My car's GPS has strong opinions about every shortcut and none of them have ever actually saved me any time.", "A goat climbed calmly onto a parked car, admired the view, and then simply refused to acknowledge the owner. Eventually.", "The neighborhood squirrels have started stockpiling acorns like they know something specific about winter that we do not. For once.", "Somewhere a swan chased a jogger for half a mile purely on principle and general swan related pride today. Reportedly.", "My washing machine has started quietly singing to itself and frankly its taste in tunes is questionable at best. Allegedly.", "A crab casually sidestepped an entire beach volleyball game and somehow still ended up being declared the winner. No joke.", "The office microwave now enforces a strict two minute rule with a menace nobody here quite understands. And everyone noticed.", "Somewhere a fox has been sneaking into a garden nightly just to rearrange the tiny garden gnomes slightly. Yet again.", "My doorbell rang, I opened the door, and a single very confident squirrel walked calmly straight past me inside. Predictably.", "A whale breached right next to a small fishing boat, looked around calmly, and simply went back under the water.", "The office stapler jammed so dramatically today that several coworkers reported hearing it sigh in visible frustration. And nobody minded.", "Somewhere a chicken crossed the same road twice just to prove a very old and very tired joke wrong. Unsurprisingly.", "My neighbor's parrot has learned the exact doorbell sound and now rings it constantly purely to watch us panic. Inexplicably.", "An octopus quietly escaped its tank, explored the aquarium gift shop, and returned before anyone even noticed it left. Understandably.", "The office copier printed forty extra pages of absolutely nothing and somehow still seemed proud of the achievement. Fair enough.", "Somewhere a badger has taken over an abandoned shed and posted what appears to be a very tiny welcome mat.", "My fridge light stays on far longer than it should and frankly I have stopped questioning what happens inside. Miraculously.", "A seagull stole an entire sandwich mid bite and calmly left the tourist holding nothing but stunned silence. Case closed.", "The office thermostat now has two settings, freezing and furious, and nobody quite remembers who changed the rules. Enough said.", "Somewhere a tortoise has quietly been declared the unofficial champion of a race it did not know was happening. Somehow.", "My neighbor's dog barks only at mail trucks it personally finds suspicious, which turns out to be most of them.", "A pelican calmly landed on a surfboard mid wave and rode it all the way to shore like a champion.", "The office vending machine ate my last dollar, judged my snack choice, and gave me a granola bar instead. Apparently.", "Somewhere a peacock has been staring at its own reflection for so long that the pond has grown visibly concerned.", "My grandfather's watch runs backward now and somehow he insists it has never once in its life been more accurate.", "A raccoon opened the recycling bin, sorted carefully through it, and left everything neater than before he had arrived. Naturally.", "The office ceiling fan wobbles once every single meeting like it too has strong feelings about quarterly updates. No comment.", "Somewhere a duck has quietly been training an entire pond of ducklings to ignore bread completely on principle alone. Obviously.", "My neighbor's cat sits exactly where the sun is at every hour like it has fully memorized the schedule. Eventually.", "A goose chased the mail carrier for three whole blocks purely because the uniform apparently offended it deeply. Make sense?", "The office elevator music changed once and four people reported feeling suspiciously more optimistic for the rest of the week.", "Somewhere a very small dog has convinced an entire dog park that it is, in fact, the largest one there.", "My neighbor's tortoise escaped the yard, crossed the street, and was found three days later exactly four feet away. Reportedly.", "A pigeon walked into the subway, picked a seat, and rode two full stops before calmly stepping back off. Allegedly.", "The office thermostat war has entered its third year and at this point nobody remembers who actually started it. Predictably.", "Somewhere a very confident cat has convinced the entire household that the laser pointer belongs to him personally. Who knew."];
   const EPOCH_MS = Date.UTC(2026, 8, 13); // 2026-09-13, day index 0
-  function todayUTCStr(){ return new Date().toISOString().slice(0, 10); }
-  function dayIndex(){
-    const nowUTC = Date.UTC(
-      new Date().getUTCFullYear(), new Date().getUTCMonth(), new Date().getUTCDate()
-    );
-    return Math.floor((nowUTC - EPOCH_MS) / 86400000);
-  }
-  const DAY_IDX = Math.max(0, dayIndex());
-  const TODAY_PHRASE = PHRASES[DAY_IDX % PHRASES.length];
-  const TODAY_WORDS = TODAY_PHRASE.split(' ');
 
-  // ---- ORP flash rendering (same technique as the reader tool) --------
+  function dateStr(y, m, d){
+    return y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+  }
+  function dayIndexForUTC(y, m, d){
+    return Math.floor((Date.UTC(y, m, d) - EPOCH_MS) / 86400000);
+  }
+  function phraseIndexForDayIdx(idx){
+    const len = PHRASES.length;
+    return ((idx % len) + len) % len;
+  }
+  function todayUTC(){
+    const n = new Date();
+    return { y: n.getUTCFullYear(), m: n.getUTCMonth(), d: n.getUTCDate() };
+  }
+
+  // ---- build the September 1-30 list -----------------------------------
+  const TODAY = todayUTC();
+  const TODAY_STR = dateStr(TODAY.y, TODAY.m, TODAY.d);
+  const DAY_LABELS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+  const DAYS = [];
+  for (let d = 1; d <= 30; d++) {
+    const ds = dateStr(2026, 8, d); // September = month index 8
+    const idx = dayIndexForUTC(2026, 8, d);
+    const weekday = new Date(Date.UTC(2026, 8, d)).getUTCDay();
+    DAYS.push({
+      date: ds,
+      dayNum: d,
+      dayIdx: idx,
+      phraseIdx: phraseIndexForDayIdx(idx),
+      weekdayLabel: DAY_LABELS[weekday],
+      locked: ds > TODAY_STR,
+      isToday: ds === TODAY_STR,
+    });
+  }
+
+  // ---- ORP flash rendering (same technique as the main game) ----------
   const flashPre = document.getElementById('flashPre');
   const flashPivot = document.getElementById('flashPivot');
   const flashPost = document.getElementById('flashPost');
@@ -350,40 +348,13 @@
     flashPost.textContent = word.slice(i + 1);
   }
 
-  // ---- stage elements ---------------------------------------------------
-  const stageIdle = document.getElementById('stageIdle');
-  const stageCountdown = document.getElementById('stageCountdown');
-  const stageFlash = document.getElementById('stageFlash');
-  const stageRecall = document.getElementById('stageRecall');
-  const stageResult = document.getElementById('stageResult');
-  const countdownNum = document.getElementById('countdownNum');
-  const flashProgressFill = document.getElementById('flashProgressFill');
-  const startBtn = document.getElementById('startBtn');
-  const recallInput = document.getElementById('recallInput');
-  const recallSubmitBtn = document.getElementById('recallSubmitBtn');
-  const scoreNum = document.getElementById('scoreNum');
-  const scoreTier = document.getElementById('scoreTier');
-  const phraseReveal = document.getElementById('phraseReveal');
-  const nameInput = document.getElementById('nameInput');
-  const lbSubmitBtn = document.getElementById('lbSubmitBtn');
-  const submitRow = document.getElementById('submitRow');
-  const againNote = document.getElementById('againNote');
-  const phraseMeta = document.getElementById('phraseMeta');
-
-  function showStage(el){
-    [stageIdle, stageCountdown, stageFlash, stageRecall, stageResult].forEach(s => { s.hidden = (s !== el); });
-  }
-
-  phraseMeta.textContent = 'Phrase #' + (DAY_IDX % PHRASES.length + 1) + ' · ' + todayUTCStr() + ' UTC';
-
-  // ---- normalize + score -------------------------------------------------
   function normalizeWord(w){
     return (w || '').toLowerCase().replace(/[^a-z0-9']/g, '');
   }
-  function scoreAttempt(typedText){
+  function scoreAttempt(typedText, words){
     const typed = typedText.trim().split(/\s+/).filter(Boolean);
     let correct = 0;
-    const revealHtml = TODAY_WORDS.map((w, i) => {
+    const revealHtml = words.map((w, i) => {
       const hit = normalizeWord(typed[i]) === normalizeWord(w) && normalizeWord(w).length > 0;
       if (hit) correct++;
       const span = document.createElement('span');
@@ -391,7 +362,7 @@
       span.textContent = w;
       return span.outerHTML;
     }).join(' ');
-    const pct = Math.round((correct / TODAY_WORDS.length) * 1000) / 10;
+    const pct = Math.round((correct / words.length) * 1000) / 10;
     return { correct, pct, revealHtml };
   }
   function tierFor(pct){
@@ -402,49 +373,90 @@
     return "It's basically a blur at 1,000 wpm. Everyone starts here.";
   }
 
-  // ---- one play per UTC day, tracked locally -----------------------------
-  const PLAYED_KEY = 'citolex_game_played_day';
-  const SCORE_KEY = 'citolex_game_last_score';
-  const NAME_KEY = 'citolex_game_last_name';
-  const SUBMITTED_KEY = 'citolex_game_submitted_day';
-
-  function alreadyPlayedToday(){
-    try { return localStorage.getItem(PLAYED_KEY) === String(DAY_IDX); } catch(e) { return false; }
+  // ---- "played" tracking, archive-only, for the ✓ badge ----------------
+  const DONE_KEY = 'citolex_archive_done';
+  function loadDoneSet(){
+    try { return new Set(JSON.parse(localStorage.getItem(DONE_KEY) || '[]')); }
+    catch(e){ return new Set(); }
   }
-  function markPlayedToday(pct){
+  function markDone(ds){
     try {
-      localStorage.setItem(PLAYED_KEY, String(DAY_IDX));
-      localStorage.setItem(SCORE_KEY, String(pct));
+      const set = loadDoneSet();
+      set.add(ds);
+      localStorage.setItem(DONE_KEY, JSON.stringify(Array.from(set)));
     } catch(e){}
   }
-  function alreadySubmittedToday(){
-    try { return localStorage.getItem(SUBMITTED_KEY) === String(DAY_IDX); } catch(e) { return false; }
+
+  // ---- render the grid ---------------------------------------------------
+  const archiveGrid = document.getElementById('archiveGrid');
+  function renderGrid(){
+    const done = loadDoneSet();
+    archiveGrid.innerHTML = DAYS.map(day => {
+      const classes = ['archive-day'];
+      if (day.locked) classes.push('is-locked');
+      if (day.isToday) classes.push('is-today');
+      if (done.has(day.date)) classes.push('is-done');
+      let badge = '';
+      if (day.locked) badge = 'Not yet';
+      else if (day.isToday) badge = 'Today';
+      else if (done.has(day.date)) badge = '✓ Played';
+      else badge = 'Play';
+      return '<button class="' + classes.join(' ') + '" data-date="' + day.date + '"' + (day.locked ? ' disabled' : '') + '>' +
+        '<div class="day-num">' + day.dayNum + '</div>' +
+        '<div class="day-label">' + day.weekdayLabel + '</div>' +
+        '<div class="day-badge">' + badge + '</div>' +
+        '</button>';
+    }).join('');
   }
-  function markSubmittedToday(){
-    try { localStorage.setItem(SUBMITTED_KEY, String(DAY_IDX)); } catch(e){}
+  renderGrid();
+
+  archiveGrid.addEventListener('click', (e) => {
+    const btn = e.target.closest('.archive-day');
+    if (!btn || btn.disabled) return;
+    startArchiveDay(btn.dataset.date);
+  });
+
+  // ---- play view ----------------------------------------------------------
+  const gridView = document.getElementById('gridView');
+  const playView = document.getElementById('playView');
+  const stageCountdown = document.getElementById('stageCountdown');
+  const stageFlash = document.getElementById('stageFlash');
+  const stageRecall = document.getElementById('stageRecall');
+  const stageResult = document.getElementById('stageResult');
+  const countdownNum = document.getElementById('countdownNum');
+  const flashProgressFill = document.getElementById('flashProgressFill');
+  const recallInput = document.getElementById('recallInput');
+  const recallSubmitBtn = document.getElementById('recallSubmitBtn');
+  const scoreNum = document.getElementById('scoreNum');
+  const scoreTier = document.getElementById('scoreTier');
+  const phraseReveal = document.getElementById('phraseReveal');
+  const backBtn = document.getElementById('backBtn');
+  const playAgainBtn = document.getElementById('playAgainBtn');
+
+  let currentWords = [];
+  let currentDate = null;
+
+  function showStage(el){
+    [stageCountdown, stageFlash, stageRecall, stageResult].forEach(s => { s.hidden = (s !== el); });
   }
 
-  function renderResult(pct, revealHtml, isReplay){
-    scoreNum.textContent = pct + '%';
-    scoreTier.textContent = tierFor(pct);
-    phraseReveal.innerHTML = revealHtml;
-    scoreNum.style.color = pct >= 50 ? 'var(--good)' : 'var(--text)';
-
-    if (alreadySubmittedToday() || isReplay) {
-      submitRow.hidden = true;
-      againNote.textContent = alreadySubmittedToday()
-        ? 'Score submitted. Come back after midnight UTC for a new phrase.'
-        : "You've already played today — this is just a replay of your run, it won't resubmit.";
-      againNote.className = alreadySubmittedToday() ? 'submitted-note' : 'again-note';
-    } else {
-      submitRow.hidden = false;
-      try { const n = localStorage.getItem(NAME_KEY); if (n) nameInput.value = n; } catch(e){}
-    }
-    showStage(stageResult);
+  function backToGrid(){
+    playView.hidden = true;
+    gridView.hidden = false;
+    renderGrid();
   }
+  backBtn.addEventListener('click', backToGrid);
+  playAgainBtn.addEventListener('click', backToGrid);
 
-  // ---- game flow ----------------------------------------------------------
-  startBtn.addEventListener('click', () => {
+  function startArchiveDay(ds){
+    const day = DAYS.find(d => d.date === ds);
+    if (!day) return;
+    currentDate = ds;
+    currentWords = PHRASES[day.phraseIdx].split(' ');
+
+    gridView.hidden = true;
+    playView.hidden = false;
+
     let count = 3;
     countdownNum.textContent = count;
     showStage(stageCountdown);
@@ -457,21 +469,21 @@
         countdownNum.textContent = count;
       }
     }, 600);
-  });
+  }
 
   function runFlash(){
     showStage(stageFlash);
     const msPerWord = 60000 / 1000; // 1000 wpm
     let i = 0;
     function step(){
-      if (i >= TODAY_WORDS.length) {
+      if (i >= currentWords.length) {
         showStage(stageRecall);
         recallInput.value = '';
         setTimeout(() => recallInput.focus(), 50);
         return;
       }
-      renderFlashWord(TODAY_WORDS[i]);
-      flashProgressFill.style.width = Math.round(((i + 1) / TODAY_WORDS.length) * 100) + '%';
+      renderFlashWord(currentWords[i]);
+      flashProgressFill.style.width = Math.round(((i + 1) / currentWords.length) * 100) + '%';
       i++;
       setTimeout(step, msPerWord);
     }
@@ -479,87 +491,14 @@
   }
 
   recallSubmitBtn.addEventListener('click', () => {
-    const { pct, revealHtml } = scoreAttempt(recallInput.value);
-    const wasAlreadyPlayed = alreadyPlayedToday();
-    if (!wasAlreadyPlayed) markPlayedToday(pct);
-    renderResult(pct, revealHtml, wasAlreadyPlayed);
+    const { pct, revealHtml } = scoreAttempt(recallInput.value, currentWords);
+    scoreNum.textContent = pct + '%';
+    scoreNum.style.color = pct >= 50 ? 'var(--good)' : 'var(--text)';
+    scoreTier.textContent = tierFor(pct);
+    phraseReveal.innerHTML = revealHtml;
+    if (currentDate) markDone(currentDate);
+    showStage(stageResult);
   });
-
-  lbSubmitBtn.addEventListener('click', async () => {
-    const name = nameInput.value.trim() || 'Anonymous';
-    try { localStorage.setItem(NAME_KEY, name); } catch(e){}
-    const pct = parseFloat(scoreNum.textContent);
-    lbSubmitBtn.disabled = true;
-    lbSubmitBtn.textContent = 'Submitting…';
-    try {
-      const res = await fetch('/api/score', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ name, accuracy: pct }),
-      });
-      if (!res.ok) throw new Error('bad response');
-      markSubmittedToday();
-      submitRow.hidden = true;
-      againNote.textContent = 'Score submitted. Come back after midnight UTC for a new phrase.';
-      againNote.className = 'submitted-note';
-      loadLeaderboard(currentPeriod);
-    } catch (e) {
-      lbSubmitBtn.disabled = false;
-      lbSubmitBtn.textContent = 'Submit score';
-      nameInput.insertAdjacentHTML('afterend', '');
-      againNote.textContent = "Couldn't reach the leaderboard just now — try again in a moment.";
-    }
-  });
-
-  // If they already played today, skip straight to their stored result.
-  if (alreadyPlayedToday()) {
-    let storedPct = 0;
-    try { storedPct = parseFloat(localStorage.getItem(SCORE_KEY) || '0'); } catch(e){}
-    // We don't have their exact typed text anymore, so just show the
-    // phrase fully revealed (all correct) alongside their real stored score.
-    const revealHtml = TODAY_WORDS.map(w => '<span class="hit">' + w + '</span>').join(' ');
-    scoreTier.textContent = '';
-    renderResult(storedPct, revealHtml, true);
-  }
-
-  // ---- leaderboard ----------------------------------------------------
-  const lbList = document.getElementById('lbList');
-  const lbTabs = document.getElementById('lbTabs');
-  let currentPeriod = 'daily';
-
-  async function loadLeaderboard(period){
-    lbList.innerHTML = '<div class="lb-empty">Loading…</div>';
-    try {
-      const res = await fetch('/api/leaderboard?period=' + encodeURIComponent(period));
-      const data = await res.json();
-      const entries = (data && data.entries) || [];
-      if (!entries.length) {
-        lbList.innerHTML = '<div class="lb-empty">No scores yet — be the first.</div>';
-        return;
-      }
-      lbList.innerHTML = entries.map((e, i) => {
-        const rank = document.createElement('div'); rank.className = 'lb-rank'; rank.textContent = '#' + (i + 1);
-        const name = document.createElement('div'); name.className = 'lb-name'; name.textContent = e.name;
-        const score = document.createElement('div'); score.className = 'lb-score'; score.textContent = e.accuracy + '%';
-        const row = document.createElement('div'); row.className = 'lb-row';
-        row.appendChild(rank); row.appendChild(name); row.appendChild(score);
-        return row.outerHTML;
-      }).join('');
-    } catch (e) {
-      lbList.innerHTML = '<div class="lb-empty">Leaderboard is warming up — check back in a bit.</div>';
-    }
-  }
-
-  lbTabs.querySelectorAll('.lb-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      lbTabs.querySelectorAll('.lb-tab').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      currentPeriod = tab.dataset.period;
-      loadLeaderboard(currentPeriod);
-    });
-  });
-
-  loadLeaderboard(currentPeriod);
 </script>
 
 </body>
