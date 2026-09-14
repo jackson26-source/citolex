@@ -166,6 +166,25 @@
   .legend-dot.locked{ background: var(--text-faint); }
   .legend-dot.today{ background: var(--accent); }
 
+  .archive-day.is-paywalled{ opacity: 0.62; }
+  .archive-day.is-paywalled .day-badge{ color: var(--accent-2); }
+
+  .unlock-banner{
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    background: var(--panel); border:1px solid var(--border-strong); border-radius: 999px;
+    padding: 10px 18px; margin: 0 auto 22px; max-width: fit-content; font-size:13.5px;
+    color: var(--text-dim); flex-wrap:wrap; text-align:center;
+  }
+  .unlock-banner a{
+    color: #0a0a0f; background: var(--accent-grad); font-weight:700; text-decoration:none;
+    padding: 7px 16px; border-radius: 999px; font-size:13px;
+  }
+  .verify-status{
+    text-align:center; font-size:13.5px; color: var(--text-dim); margin: -10px auto 20px;
+  }
+  .verify-status.is-success{ color: var(--good); }
+  .verify-status.is-error{ color: var(--bad); }
+
   /* PLAY VIEW (reused game stage look) */
   .game-card{
     background: var(--panel); border:1px solid var(--border); border-radius: 20px;
@@ -296,6 +315,12 @@
       <p class="subhead">Every phrase from the last three months, all in one place. Pick a day and play it — just for fun, these don't go to the leaderboard.</p>
     </div>
 
+    <p class="verify-status" id="verifyStatus" hidden></p>
+    <div class="unlock-banner" id="unlockBanner" hidden>
+      <span>🔒 $2 unlocks every past (and future) day, forever, in this browser</span>
+      <a href="https://buy.stripe.com/3cIbJ34OS3ay2fu2rQfbq06">Unlock archive — $2</a>
+    </div>
+
     <div class="month-tabs" id="monthTabs"></div>
     <div class="archive-grid" id="archiveGrid"></div>
 
@@ -352,6 +377,19 @@
           <button class="play-again-btn" id="playAgainBtn" style="margin-top:14px;">← Back to archive</button>
         </div>
 
+      </div>
+    </div>
+  </div>
+
+  <div id="paywallView" hidden>
+    <button class="back-link" id="paywallBackBtn">← Back to archive</button>
+    <div class="game-card">
+      <div class="game-stage">
+        <p class="look-here-label">🔒 Locked</p>
+        <h1 style="font-size:26px; margin-top:6px;">Unlock the full archive</h1>
+        <p class="rules-hint" style="max-width:420px;">One-time $2 payment. Every past day — and every day going forward — stays unlocked right here in this browser. No account, no subscription.</p>
+        <a class="play-btn" id="paywallUnlockBtn" href="https://buy.stripe.com/3cIbJ34OS3ay2fu2rQfbq06" style="margin-top:10px; text-decoration:none; display:inline-block;">Unlock archive — $2</a>
+        <p class="practice-note" style="margin-top:4px;">Card statements read "MACLESS.DEV" — same team, different receipt name.</p>
       </div>
     </div>
   </div>
@@ -631,6 +669,61 @@
     } catch(e){}
   }
 
+  // ---- $2 lifetime archive unlock ------------------------------------------
+  // Pay once via the Stripe Payment Link; Stripe redirects back here with
+  // ?session_id=cs_..., which we re-verify server-side (never trust the URL
+  // alone) before flipping the local "unlocked" flag. Once set, every past
+  // and future archive day stays open in this browser — no re-checking.
+  const UNLOCK_KEY = 'citolex_archive_unlocked';
+  function isUnlocked(){
+    try { return localStorage.getItem(UNLOCK_KEY) === '1'; } catch(e){ return false; }
+  }
+  function setUnlocked(){
+    try { localStorage.setItem(UNLOCK_KEY, '1'); } catch(e){}
+  }
+
+  const unlockBanner = document.getElementById('unlockBanner');
+  const verifyStatusEl = document.getElementById('verifyStatus');
+  function refreshUnlockBanner(){
+    if (unlockBanner) unlockBanner.hidden = isUnlocked();
+  }
+  function setVerifyStatus(msg, kind){
+    if (!verifyStatusEl) return;
+    if (!msg) { verifyStatusEl.hidden = true; verifyStatusEl.textContent = ''; return; }
+    verifyStatusEl.hidden = false;
+    verifyStatusEl.textContent = msg;
+    verifyStatusEl.className = 'verify-status' + (kind ? ' is-' + kind : '');
+  }
+
+  (async function checkForReturningPurchase(){
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = params.get('session_id');
+    if (!sessionId) return;
+
+    // Strip it from the URL right away so a page refresh never re-triggers
+    // a lookup for an already-used session id.
+    const cleanUrl = window.location.pathname;
+    window.history.replaceState({}, '', cleanUrl);
+
+    if (isUnlocked()) return; // already unlocked in this browser, nothing to do
+
+    setVerifyStatus('Verifying your purchase…');
+    try {
+      const res = await fetch('/api/verify-purchase?session_id=' + encodeURIComponent(sessionId));
+      const data = await res.json();
+      if (data && data.unlocked) {
+        setUnlocked();
+        refreshUnlockBanner();
+        if (typeof renderGrid === 'function') renderGrid();
+        setVerifyStatus('Unlocked — every archive day is yours now. Enjoy.', 'success');
+      } else {
+        setVerifyStatus("Couldn't verify that purchase. If you were just charged, contact us and we'll sort it out.", 'error');
+      }
+    } catch (e) {
+      setVerifyStatus("Couldn't reach the server to verify your purchase — try refreshing this page.", 'error');
+    }
+  })();
+
   // ---- month tabs ----------------------------------------------------------
   let selectedMonth = TODAY.m;
   const monthTabs = document.getElementById('monthTabs');
@@ -654,13 +747,17 @@
   const archiveGrid = document.getElementById('archiveGrid');
   function renderGrid(){
     const done = loadDoneSet();
+    const unlocked = isUnlocked();
     archiveGrid.innerHTML = DAYS.filter(day => day.month === selectedMonth).map(day => {
       const classes = ['archive-day'];
+      const paywalled = !day.locked && !unlocked;
       if (day.locked) classes.push('is-locked');
+      if (paywalled) classes.push('is-paywalled');
       if (day.isToday) classes.push('is-today');
       if (done.has(day.date)) classes.push('is-done');
       let badge = '';
       if (day.locked) badge = 'Not yet';
+      else if (paywalled) badge = '🔒 $2';
       else if (day.isToday) badge = 'Today';
       else if (done.has(day.date)) badge = '✓ Played';
       else badge = 'Play';
@@ -671,11 +768,16 @@
         '</button>';
     }).join('');
   }
+  refreshUnlockBanner();
   renderGrid();
 
   archiveGrid.addEventListener('click', (e) => {
     const btn = e.target.closest('.archive-day');
     if (!btn || btn.disabled) return;
+    if (!isUnlocked()) {
+      showPaywall();
+      return;
+    }
     startArchiveDay(btn.dataset.date);
   });
 
@@ -702,6 +804,8 @@
   const shareImgBtn = document.getElementById('shareImgBtn');
   const shareTextBtn = document.getElementById('shareTextBtn');
   const shareStatus = document.getElementById('shareStatus');
+  const paywallView = document.getElementById('paywallView');
+  const paywallBackBtn = document.getElementById('paywallBackBtn');
   let lastResult = null;
 
   let currentWords = [];
@@ -713,11 +817,20 @@
 
   function backToGrid(){
     playView.hidden = true;
+    paywallView.hidden = true;
     gridView.hidden = false;
+    refreshUnlockBanner();
     renderGrid();
   }
   backBtn.addEventListener('click', backToGrid);
   playAgainBtn.addEventListener('click', backToGrid);
+  paywallBackBtn.addEventListener('click', backToGrid);
+
+  function showPaywall(){
+    gridView.hidden = true;
+    playView.hidden = true;
+    paywallView.hidden = false;
+  }
 
   function startArchiveDay(ds){
     const day = DAYS.find(d => d.date === ds);
