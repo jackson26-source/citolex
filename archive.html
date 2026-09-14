@@ -249,6 +249,16 @@
     box-sizing:border-box;
   }
   .your-answer.is-empty{ color: var(--text-dim); font-style:italic; }
+  .share-row{ display:flex; gap:10px; width:100%; }
+  .share-btn{
+    flex:1; background: var(--accent-grad); border:none; color:#0a0a0f; font-weight:700; font-size:14px;
+    padding:12px 16px; border-radius: var(--radius-sm); cursor:pointer; font-family:inherit;
+  }
+  .share-btn.secondary{
+    background: var(--panel-2); border:1px solid var(--border-strong); color: var(--text); font-weight:600;
+  }
+  .share-btn:disabled{ opacity:0.6; cursor:not-allowed; }
+  .share-status{ font-size:12px; color: var(--text-faint); margin-top:8px; min-height:14px; text-align:center; }
   .practice-note{ font-size:12.5px; color: var(--text-faint); }
   .play-again-btn{
     background: var(--panel-2); border:1px solid var(--border-strong); color: var(--text); font-weight:600;
@@ -333,6 +343,11 @@
             <div class="answer-compare-label">The phrase</div>
             <div class="phrase-reveal" id="phraseReveal"></div>
           </div>
+          <div class="share-row" style="margin-top:16px;">
+            <button class="share-btn" id="shareImgBtn">Share score</button>
+            <button class="share-btn secondary" id="shareTextBtn">Copy as text</button>
+          </div>
+          <p class="share-status" id="shareStatus"></p>
           <p class="practice-note" style="margin-top:16px;">Practice run — this doesn't go to any leaderboard.</p>
           <button class="play-again-btn" id="playAgainBtn" style="margin-top:14px;">← Back to archive</button>
         </div>
@@ -492,7 +507,7 @@
       return span.outerHTML;
     }).join(' ');
     const pct = Math.round((correct / words.length) * 1000) / 10;
-    return { correct, pct, revealHtml };
+    return { correct, pct, revealHtml, status };
   }
   function tierFor(pct){
     if (pct === 100) return "Perfect. You're either a speed reader or you peeked.";
@@ -500,6 +515,106 @@
     if (pct >= 50) return "Respectable — that's a brutal speed.";
     if (pct >= 20) return "Bold attempt. It really does fly by.";
     return "It's basically a blur at 1,000 wpm. Everyone starts here.";
+  }
+
+  // ---- share card (canvas-generated, Wordle-style) -----------------------
+  function roundRect(ctx, x, y, w, h, r){
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+  function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight){
+    const words = text.split(' ');
+    let line = '';
+    const lines = [];
+    words.forEach(word => {
+      const test = line ? line + ' ' + word : word;
+      if (ctx.measureText(test).width > maxWidth && line) {
+        lines.push(line);
+        line = word;
+      } else {
+        line = test;
+      }
+    });
+    if (line) lines.push(line);
+    lines.forEach((l, i) => ctx.fillText(l, x, y + i * lineHeight));
+    return lines.length;
+  }
+  function buildShareGridEmoji(status){
+    return status.map(s => s === 'hit' ? '🟩' : (s === 'typo' ? '🟨' : '⬛'));
+  }
+  async function drawShareCard(pct, tierText, status, dayLabel){
+    try { await document.fonts.ready; } catch(e){}
+    const W = 1080, H = 1350;
+    const canvas = document.createElement('canvas');
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext('2d');
+
+    const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+    bgGrad.addColorStop(0, '#12121b');
+    bgGrad.addColorStop(1, '#0a0a0f');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, W, H);
+
+    const glow = ctx.createRadialGradient(W / 2, 250, 40, W / 2, 250, 560);
+    glow.addColorStop(0, 'rgba(124,108,240,0.20)');
+    glow.addColorStop(1, 'rgba(124,108,240,0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+
+    ctx.font = '800 40px Inter, sans-serif';
+    ctx.fillStyle = '#f2f2f7';
+    ctx.fillText('citolex', W / 2, 120);
+
+    ctx.font = '600 28px Inter, sans-serif';
+    ctx.fillStyle = '#7c6cf0';
+    ctx.fillText(dayLabel, W / 2, 165);
+
+    ctx.font = '800 210px Inter, sans-serif';
+    ctx.fillStyle = pct >= 50 ? '#5ee6c7' : '#f2f2f7';
+    ctx.fillText(pct + '%', W / 2, 460);
+
+    ctx.font = '500 32px Inter, sans-serif';
+    ctx.fillStyle = '#c8c8d4';
+    wrapCanvasText(ctx, tierText, W / 2, 545, 860, 42);
+
+    const cols = 5;
+    const cell = 96, gap = 18;
+    const rows = Math.ceil(status.length / cols);
+    const gridW = cols * cell + (cols - 1) * gap;
+    const gridH = rows * cell + (rows - 1) * gap;
+    const startX = (W - gridW) / 2;
+    const startY = 700;
+    status.forEach((s, idx) => {
+      const col = idx % cols, row = Math.floor(idx / cols);
+      const x = startX + col * (cell + gap);
+      const y = startY + row * (cell + gap);
+      ctx.fillStyle = s === 'hit' ? '#5ee6c7' : (s === 'typo' ? '#f5c542' : '#20202b');
+      roundRect(ctx, x, y, cell, cell, 16);
+      ctx.fill();
+    });
+
+    ctx.font = '600 30px Inter, sans-serif';
+    ctx.fillStyle = '#5c5c6e';
+    ctx.fillText('citolex.com — 1,000 words a minute', W / 2, startY + gridH + 80);
+
+    return canvas;
+  }
+  function downloadBlob(blob, filename){
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
   }
 
   // ---- "played" tracking, archive-only, for the ✓ badge ----------------
@@ -584,6 +699,10 @@
   const phraseReveal = document.getElementById('phraseReveal');
   const backBtn = document.getElementById('backBtn');
   const playAgainBtn = document.getElementById('playAgainBtn');
+  const shareImgBtn = document.getElementById('shareImgBtn');
+  const shareTextBtn = document.getElementById('shareTextBtn');
+  const shareStatus = document.getElementById('shareStatus');
+  let lastResult = null;
 
   let currentWords = [];
   let currentDate = null;
@@ -648,17 +767,82 @@
 
   recallSubmitBtn.addEventListener('click', () => {
     const typedRaw = recallInput.value;
-    const { pct, revealHtml } = scoreAttempt(typedRaw, currentWords);
+    const { pct, revealHtml, status } = scoreAttempt(typedRaw, currentWords);
     scoreNum.textContent = pct + '%';
     scoreNum.style.color = pct >= 50 ? 'var(--good)' : 'var(--text)';
-    scoreTier.textContent = tierFor(pct);
+    const tierText = tierFor(pct);
+    scoreTier.textContent = tierText;
     const typedTrimmed = typedRaw.trim();
     yourAnswer.textContent = typedTrimmed || '(nothing typed)';
     yourAnswer.classList.toggle('is-empty', !typedTrimmed);
     phraseReveal.innerHTML = revealHtml;
     if (currentDate) markDone(currentDate);
+    const day = DAYS.find(d => d.date === currentDate);
+    lastResult = {
+      pct, tierText, status,
+      dayLabel: day ? (day.monthLabel + ' ' + day.dayNum + ' replay') : 'Archive replay',
+    };
+    setShareStatus('');
     showStage(stageResult);
   });
+
+  function setShareStatus(msg){
+    if (shareStatus) shareStatus.textContent = msg || '';
+  }
+  if (shareImgBtn) {
+    shareImgBtn.addEventListener('click', async () => {
+      if (!lastResult) return;
+      const origText = shareImgBtn.textContent;
+      shareImgBtn.disabled = true;
+      shareImgBtn.textContent = 'Preparing…';
+      try {
+        const canvas = await drawShareCard(lastResult.pct, lastResult.tierText, lastResult.status, lastResult.dayLabel);
+        canvas.toBlob(async (blob) => {
+          shareImgBtn.disabled = false;
+          shareImgBtn.textContent = origText;
+          if (!blob) { setShareStatus("Couldn't generate the image."); return; }
+          const file = new File([blob], 'citolex-score.png', { type: 'image/png' });
+          try {
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+              await navigator.share({
+                files: [file],
+                title: 'My Citolex score',
+                text: 'I scored ' + lastResult.pct + '% on Citolex — try it: citolex.com',
+              });
+              setShareStatus('Shared.');
+            } else {
+              downloadBlob(blob, 'citolex-score.png');
+              setShareStatus('Image saved — share it wherever you like.');
+            }
+          } catch (e) {
+            if (e && e.name !== 'AbortError') {
+              downloadBlob(blob, 'citolex-score.png');
+              setShareStatus('Image saved — share it wherever you like.');
+            }
+          }
+        }, 'image/png');
+      } catch (e) {
+        shareImgBtn.disabled = false;
+        shareImgBtn.textContent = origText;
+        setShareStatus("Couldn't generate the share image.");
+      }
+    });
+  }
+  if (shareTextBtn) {
+    shareTextBtn.addEventListener('click', async () => {
+      if (!lastResult) return;
+      const emojis = buildShareGridEmoji(lastResult.status);
+      const gridLines = [];
+      for (let i = 0; i < emojis.length; i += 5) gridLines.push(emojis.slice(i, i + 5).join(''));
+      const text = 'Citolex — ' + lastResult.dayLabel + '\n' + lastResult.pct + '%\n' + gridLines.join('\n') + '\ncitolex.com';
+      try {
+        await navigator.clipboard.writeText(text);
+        setShareStatus('Copied to clipboard.');
+      } catch (e) {
+        setShareStatus("Couldn't copy — select and copy manually.");
+      }
+    });
+  }
 </script>
 
 </body>
