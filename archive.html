@@ -497,36 +497,74 @@
     if (dist === 0) return false;
     return dist === 1 || dist / Math.max(a.length, b.length) <= 0.25;
   }
-  // Sequence-alignment scoring (Needleman-Wunsch style, over normalized
-  // words) instead of strict position-by-position matching. A skipped or
-  // reordered word then only costs that one word, instead of shifting
-  // every word after it out of alignment and sinking the whole score. An
-  // exact word scores 1 (green); a close misspelling scores 0.5 (shown
-  // crossed out in yellow); anything else scores 0 (miss, red).
+  // Scoring: an exact word always counts, no matter where in the answer it
+  // landed (capped at how many times that word actually appears in the
+  // phrase, so typing "the" once doesn't credit every "the" in it) — then
+  // a second, order-preserving pass (Needleman-Wunsch style) looks for
+  // near-miss typos among whatever's left, so a misspelling still gets
+  // half credit without letting the whole phrase be typed back in random
+  // order for typo credit too. Exact scores 1 (green); a close misspelling
+  // scores 0.5 (shown crossed out in yellow); anything else scores 0
+  // (miss, red).
   function scoreAttempt(typedText, words){
-    const typed = typedText.trim().split(/\s+/).filter(Boolean).slice(0, 400).map(normalizeWord);
-    const actual = words.map(normalizeWord);
-    const n = actual.length, m = typed.length;
+    const typedNorm = typedText.trim().split(/\s+/).filter(Boolean).slice(0, 400).map(normalizeWord);
+    const actualNorm = words.map(normalizeWord);
+    const n = actualNorm.length;
+
+    // Pass 1: exact matches, bag-of-words style (position-independent).
+    const typedCounts = new Map();
+    typedNorm.forEach(w => typedCounts.set(w, (typedCounts.get(w) || 0) + 1));
+    const totalTypedCounts = new Map(typedCounts);
+    const status = new Array(n).fill('miss');
+    const remainingIdx = [];
+    for (let i = 0; i < n; i++){
+      const w = actualNorm[i];
+      const avail = typedCounts.get(w) || 0;
+      if (avail > 0){
+        status[i] = 'hit';
+        typedCounts.set(w, avail - 1);
+      } else {
+        remainingIdx.push(i);
+      }
+    }
+
+    // Figure out which typed occurrences are left over after the exact
+    // pass, preserving original order, for the typo pass below.
+    const consumedSoFar = new Map();
+    const typedRemaining = [];
+    typedNorm.forEach(w => {
+      const totalConsumed = (totalTypedCounts.get(w) || 0) - (typedCounts.get(w) || 0);
+      const skippedSoFar = consumedSoFar.get(w) || 0;
+      if (skippedSoFar < totalConsumed) {
+        consumedSoFar.set(w, skippedSoFar + 1);
+      } else {
+        typedRemaining.push(w);
+      }
+    });
+
+    // Pass 2: order-preserving alignment for typo (near-miss) credit only,
+    // over whatever the exact pass didn't resolve.
+    const actualRemaining = remainingIdx.map(i => actualNorm[i]);
+    const rn = actualRemaining.length, m = typedRemaining.length;
     function pairScore(a, b){
       if (!a || !b) return -Infinity;
-      if (a === b) return 1;
       return isTypo(a, b) ? 0.5 : -Infinity;
     }
     const dp = [];
-    for (let i = 0; i <= n; i++) dp.push(new Array(m + 1).fill(0));
-    for (let i = 1; i <= n; i++){
+    for (let i = 0; i <= rn; i++) dp.push(new Array(m + 1).fill(0));
+    for (let i = 1; i <= rn; i++){
       for (let j = 1; j <= m; j++){
-        const sim = pairScore(actual[i - 1], typed[j - 1]);
+        const sim = pairScore(actualRemaining[i - 1], typedRemaining[j - 1]);
         const diag = sim === -Infinity ? -Infinity : dp[i - 1][j - 1] + sim;
         dp[i][j] = Math.max(diag, dp[i - 1][j], dp[i][j - 1]);
       }
     }
-    const status = new Array(n).fill('miss');
-    let i = n, j = m;
+    let i = rn, j = m;
+    const typoHit = new Array(rn).fill(false);
     while (i > 0 && j > 0) {
-      const sim = pairScore(actual[i - 1], typed[j - 1]);
+      const sim = pairScore(actualRemaining[i - 1], typedRemaining[j - 1]);
       if (sim !== -Infinity && dp[i][j] === dp[i - 1][j - 1] + sim) {
-        status[i - 1] = sim === 1 ? 'hit' : 'typo';
+        typoHit[i - 1] = true;
         i--; j--;
       } else if (dp[i][j] === dp[i - 1][j]) {
         i--;
@@ -534,6 +572,8 @@
         j--;
       }
     }
+    remainingIdx.forEach((origIdx, k) => { if (typoHit[k]) status[origIdx] = 'typo'; });
+
     let correct = 0;
     const revealHtml = words.map((w, idx) => {
       const s = status[idx];
